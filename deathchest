@@ -1,0 +1,25 @@
+on death:
+  if victim is player:
+    set {_loc} to location of block at victim
+    set block at {_loc} to chest
+    set metadata value "death_chest" of block at {_loc} to "%uuid of victim%"
+    clear {death.item::%{_loc}%::*}
+    loop all items in victim's inventory:
+      if loop-item is not air:
+        add loop-item to {death.item::%{_loc}%::*}
+    send "&7&lyou die in %x-coordinate of {_loc}%, %y-coordinate of {_loc}%, %z-coordinate of {_loc}%" to victim
+    clear drops
+
+on rightclick on chest:
+  if metadata value "death_chest" of event-block is set:
+    cancel event
+    set {_loc} to location of event-block
+    loop {death.items::%{_loc}%::*}:
+      if player can hold loop-value:
+        give loop-value to player
+      else:
+        drop loop-value at event-location
+    delete {death.item::%{_loc}%::*}
+		delete metadata value "death_chest" of event-block
+		set event-block to air
+		send "&aAll items were recovered" to player
